@@ -1,6 +1,10 @@
 import win32com.client
 import time
-import datetime
+from numpy import *
+from pylab import *
+import matplotlib.dates as mdates
+import csv
+from datetime import datetime
 
 connected = 1
 # Start the loop
@@ -15,7 +19,7 @@ while connected == 1 :
     connected = 1
 
     # Open the text file.
-    f = open('C:/inbox.txt', 'a')
+    f = open('C:/inbox.txt', 'a') # Change to desired directory.
 
     # Count the number of messages in the inbox
     inbox = outlook.GetDefaultFolder(win32com.client.constants.olFolderInbox)
@@ -23,10 +27,30 @@ while connected == 1 :
 
     # Get the time.
     ts = time.time()
-    st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+    st = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
 
     # Write the message number and time to text file.
     f.write(st + ',' + str(messages.Count) +'\n')
     f.close()
+	
+	# Read text file and create plot.
+    data = genfromtxt('C:/inbox.txt', delimiter=',', dtype = str)
+
+    dates = [row[0] for row in data]
+    count = [row[1] for row in data]
+
+    dates[:] = [datetime.strptime(x, "%Y-%m-%d %H:%M:%S") for x in dates]
+
+    gca().xaxis.set_minor_locator(mdates.WeekdayLocator(byweekday=(1),
+                                                    interval=1))
+    gca().xaxis.set_minor_formatter(mdates.DateFormatter('%d\n%a'))
+    gca().xaxis.set_major_formatter(mdates.DateFormatter('\n\n\n%b\n%Y'))
+    gca().xaxis.set_major_locator(mdates.MonthLocator())
+    plot(dates,count)
+    gcf().autofmt_xdate()
+    xlabel('Date')
+    ylabel('Inbox Count')
+    tight_layout()
+    savefig('C:\\Users\\path\\to\\folder\\inbox.png') # Change to desired directory.
     time.sleep(1800)
