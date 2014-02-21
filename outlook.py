@@ -53,4 +53,5 @@ while connected == 1 :
     ylabel('Inbox Count')
     tight_layout()
     savefig('C:\\Users\\path\\to\\folder\\inbox.png') # Change to desired directory.
-    time.sleep(1800)
+	matplotlib.pyplot.close("all") # Close the figure so it doesn't overwrite every time.
+    time.sleep(1800) # Wait 30 mins before checking the inbox again.
